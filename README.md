@@ -15,6 +15,11 @@
 
 [echarts扩展示例](/case04/)
 
+<image src="./case05/img/thumb.png" width=500px></image><br>
+
+[全国企业大数据](/case05/)
+
+
 <image src="./case07/img/thumb.jpg" width=500px></image><br>
 
 [上市公司地域分布](/case07/)
