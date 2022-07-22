@@ -1,59 +1,50 @@
 <!--
  * @Author: hahaxiaowai 1062080110@qq.com
  * @Date: 2022-07-21 17:08:35
- * @LastEditors: hahaxiaowai 1062080110@qq.com
- * @LastEditTime: 2022-07-21 18:06:19
+ * @LastEditors: hhxy
+ * @LastEditTime: 2022-07-22 17:09:13
  * @FilePath: \case\README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 ## 案例列表
-<image src="./case01/img/thumb.jpg" width=500px></image><br>
-
-[地图展示](/case/case01/)
-
-<image src="./case02/img/thumb.jpg" width=500px></image><br>
-
-[3D图标展示](/case/case02/)
-
-<image src="./case03/img/thumb.jpg" width=500px></image><br>
-
-[热力图展示](/case/case03/)
-
-<image src="./case04/img/thumb.jpg" width=500px></image><br>
-
-[echarts扩展示例](/case/case04/)
-
-<image src="./case05/img/thumb.png" width=500px></image><br>
-
-[全国企业大数据](/case/case05/)
+<a href="/case/case01/" > <image src="./case01/img/thumb.jpg" width=500px></image></a><br>
 
 
-<image src="./case07/img/thumb.jpg" width=500px></image><br>
+<a href="/case/case02/" ><image src="./case02/img/thumb.jpg" width=500px></image></a><br>
 
-[上市公司地域分布](/case/case07/)
 
-<image src="./case09/img/thumb.jpg" width=500px></image><br>
+<a href="/case/case03/" ><image src="./case03/img/thumb.jpg" width=500px></image></a><br>
 
-[上市公司全景概览](/case/case09/)
+
+<a href="/case/case04/" ><image src="./case04/img/thumb.jpg" width=500px></image></a><br>
+
+
+<a href="/case/case05/" ><image src="./case05/img/thumb.png" width=500px></image></a><br>
+
+
+<a href="/case/case06/#/page1" ><image src="./case06/img/page1.jpg" width=500px></image></a><br>
+<a href="/case/case06/#/page2" ><image src="./case06/img/page2.jpg" width=500px></image></a><br>
+<a href="/case/case06/#/page3" ><image src="./case06/img/page3.jpg" width=500px></image></a><br>
+
+
+<a href="/case/case07/" ><image src="./case07/img/thumb.jpg" width=500px></image></a><br>
+
+
+<a href="/case/case09/" ><image src="./case09/img/thumb.jpg" width=500px></image></a><br>
 
 
 ### tpl01-tpl05 大屏模板
-<image src="./tpl01/img/thumb.jpg" width=500px></image><br>
+<a href="/case/tpl01/" ><image src="./tpl01/img/thumb.jpg" width=500px></image></a><br>
 
-[tpl01](/case/tpl01/)
 
-<image src="./tpl02/img/thumb.jpg" width=500px></image><br>
+<a href="/case/tpl02/" ><image src="./tpl02/img/thumb.jpg" width=500px></image></a><br>
 
-[tpl02](/case/tpl02/)
 
-<image src="./tpl03/img/thumb.jpg" width=500px></image><br>
+<a href="/case/tpl03/" ><image src="./tpl03/img/thumb.jpg" width=500px></image></a><br>
 
-[tpl03](/case/tpl03/)
 
-<image src="./tpl04/img/thumb.jpg" width=500px></image><br>
+<a href="/case/tpl04/" ><image src="./tpl04/img/thumb.jpg" width=500px></image></a><br>
 
-[tpl04](/case/tpl04/)
 
-<image src="./tpl05/img/thumb.png" width=500px></image><br>
+<a href="/case/tpl05/" ><image src="./tpl05/img/thumb.png" width=500px></image></a><br>
 
-[tpl05](/case/tpl05/)
