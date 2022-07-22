@@ -2,7 +2,7 @@
  * @Author: hahaxiaowai 1062080110@qq.com
  * @Date: 2022-07-21 17:08:35
  * @LastEditors: hhxy
- * @LastEditTime: 2022-07-22 17:09:13
+ * @LastEditTime: 2022-07-22 17:18:11
  * @FilePath: \case\README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -33,6 +33,7 @@
 <a href="/case/case09/" ><image src="./case09/img/thumb.jpg" width=500px></image></a><br>
 
 
+
 ### tpl01-tpl05 大屏模板
 <a href="/case/tpl01/" ><image src="./tpl01/img/thumb.jpg" width=500px></image></a><br>
 
@@ -47,4 +48,7 @@
 
 
 <a href="/case/tpl05/" ><image src="./tpl05/img/thumb.png" width=500px></image></a><br>
+
+
+<a href="/case/case08/" ><image src="./case08/thumb.png" width=500px></image></a><br>
 
