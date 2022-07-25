@@ -1,0 +1,1553 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>index</title>
+    <script type="text/javascript" src="./static/js/jquery.js"></script>
+    <link rel="stylesheet" href="./static/css/comon0.css" />
+    <style>
+      @import url(./Cesium/Widgets/widgets.css);
+      /* @import url(./Cesium/bucket.css); */
+      #toolbar {
+        background: rgba(42, 42, 42, 0.8);
+        padding: 4px;
+        border-radius: 4px;
+      }
+      #toolbar input {
+        vertical-align: middle;
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
+      #toolbar .header {
+        font-weight: bold;
+      }
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <script>
+    $(window).load(function () {
+      $(".loading").fadeOut();
+    });
+
+    /****/
+    $(document).ready(function () {
+      var whei = $(window).width();
+      $("html").css({ fontSize: whei / 20 });
+      $(window).resize(function () {
+        var whei = $(window).width();
+        $("html").css({ fontSize: whei / 20 });
+      });
+    });
+  </script>
+  <script type="text/javascript" src="./static/js/echarts.min.js"></script>
+  <script type="text/javascript" src="./static/js/china.js"></script>
+  <script type="text/javascript" src="./Cesium/Cesium.js"></script>
+  <script src="./CesiumHeatmap.js"></script>
+  <body>
+    <div class="canvas" style="opacity: 0.2">
+      <iframe
+        frameborder="0"
+        src="./static/js/index.html"
+        style="width: 100%; height: 100%"
+      ></iframe>
+    </div>
+    <div class="loading">
+      <div class="loadbox">
+        <img src="./static/picture/loading.gif" /> 页面加载中...
+      </div>
+    </div>
+    <div class="head">
+      <h1>全国企业大数据</h1>
+      <div class="weather">
+        <!--        <img src="picture/weather.png"><span>多云转小雨</span>-->
+        <span id="showTime"></span>
+      </div>
+
+      <script>
+        var t = null;
+        t = setTimeout(time, 1000); //開始运行
+        function time() {
+          clearTimeout(t); //清除定时器
+          dt = new Date();
+          var y = dt.getFullYear();
+          var mt = dt.getMonth() + 1;
+          var day = dt.getDate();
+          var h = dt.getHours(); //获取时
+          var m = dt.getMinutes(); //获取分
+          var s = dt.getSeconds(); //获取秒
+          document.getElementById("showTime").innerHTML =
+            y +
+            "年" +
+            mt +
+            "月" +
+            day +
+            "日" +
+            "-" +
+            h +
+            "时" +
+            m +
+            "分" +
+            s +
+            "秒";
+          t = setTimeout(time, 1000); //设定定时器，循环运行
+        }
+      </script>
+    </div>
+    <div class="mainbox">
+      <ul class="clearfix">
+        <li>
+          <div class="boxall" style="height: 3.2rem">
+            <div class="alltitle">行业分布</div>
+            <div class="allnav" id="echart1"></div>
+            <div class="boxfoot"></div>
+          </div>
+          <div class="boxall" style="height: 3.2rem">
+            <div class="alltitle">省份分布</div>
+            <div class="allnav" id="echart2"></div>
+            <div class="boxfoot"></div>
+          </div>
+          <div class="boxall" style="height: 3.2rem">
+            <div style="height: 100%; width: 100%">
+              <div class="sy" id="fb1"></div>
+              <div class="sy" id="fb2"></div>
+              <div class="sy" id="fb3"></div>
+            </div>
+            <div class="boxfoot"></div>
+          </div>
+        </li>
+        <li>
+          <div class="bar">
+            <div class="barbox">
+              <ul class="clearfix">
+                <li class="pulll_left counter">46897675</li>
+                <li class="pulll_left counter">6805564</li>
+              </ul>
+            </div>
+            <div class="barbox2">
+              <ul class="clearfix">
+                <li class="pulll_left">企业总数量（全国）</li>
+                <li class="pulll_left">企业总数量（一线城市）</li>
+              </ul>
+            </div>
+          </div>
+          <div class="map">
+            <div id="cesiumContainer"></div>
+          </div>
+        </li>
+        <li>
+          <div class="boxall" style="height: 3.4rem">
+            <div class="alltitle">新一线城市</div>
+            <div class="allnav" id="echart4"></div>
+            <div class="boxfoot"></div>
+          </div>
+          <div class="boxall" style="height: 3.2rem">
+            <div class="alltitle">厦门行业分布</div>
+            <div class="allnav" id="echart5"></div>
+            <div class="boxfoot"></div>
+          </div>
+          <div class="boxall" style="height: 3rem">
+            <div class="alltitle">一线城市</div>
+            <div class="allnav" id="echart6"></div>
+            <div class="boxfoot"></div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="back"></div>
+
+    <!--echart1-->
+    <script>
+      $(function echarts_1() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("echart1"));
+
+        option = {
+          //  backgroundColor: '#00265f',
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          grid: {
+            left: "0%",
+            top: "10px",
+            right: "0%",
+            bottom: "4%",
+            containLabel: true,
+          },
+          xAxis: [
+            {
+              type: "category",
+              data: [
+                "批发零售业",
+                "制造行业",
+                "租赁商务服务",
+                "农林牧渔业",
+                "住宿餐饮业",
+                "建筑业",
+              ],
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                interval: 0,
+                // rotate:50,
+                show: true,
+                splitNumber: 15,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              axisLabel: {
+                //formatter: '{value} %'
+                show: true,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1	)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+              splitLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                },
+              },
+            },
+          ],
+          series: [
+            {
+              type: "bar",
+              data: [16881396, 6780200, 5358030, 3335899, 2284813, 2267361],
+              barWidth: "35%", //柱子宽度
+              // barGap: 1, //柱子之间间距
+              itemStyle: {
+                normal: {
+                  color: "#2f89cf",
+                  opacity: 1,
+                  barBorderRadius: 5,
+                },
+              },
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echart2-->
+    <script>
+      $(function echarts_2() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("echart2"));
+
+        option = {
+          //  backgroundColor: '#00265f',
+          tooltip: {
+            trigger: "axis",
+            axisPointer: { type: "shadow" },
+          },
+          grid: {
+            left: "0%",
+            top: "10px",
+            right: "0%",
+            bottom: "4%",
+            containLabel: true,
+          },
+          xAxis: [
+            {
+              type: "category",
+              data: [
+                "广东",
+                "山东",
+                "江苏",
+                "河南",
+                "河北",
+                "四川",
+                "浙江",
+                "上海",
+                "北京",
+                "辽宁",
+              ],
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                interval: 0,
+                // rotate:50,
+                show: true,
+                splitNumber: 15,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              axisLabel: {
+                //formatter: '{value} %'
+                show: true,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1	)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+              splitLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                },
+              },
+            },
+          ],
+          series: [
+            {
+              type: "bar",
+              data: [
+                5635811, 3972598, 3793522, 2787866, 2402739, 2083448, 2047431,
+                1863549, 1717739, 1658253,
+              ],
+              barWidth: "35%", //柱子宽度
+              // barGap: 1, //柱子之间间距
+              itemStyle: {
+                normal: {
+                  color: "#27d08a",
+                  opacity: 1,
+                  barBorderRadius: 5,
+                },
+              },
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts3_1-->
+    <script>
+      $(function echarts_31() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("fb1"));
+        option = {
+          title: [
+            {
+              text: "IT互联网行业",
+              left: "center",
+              textStyle: {
+                color: "#fff",
+                fontSize: "16",
+              },
+            },
+          ],
+          tooltip: {
+            trigger: "item",
+            formatter: "{a} <br/>{b}: {c} ({d}%)",
+            position: function (p) {
+              //其中p为当前鼠标的位置
+              return [p[0] + 10, p[1] - 10];
+            },
+          },
+          legend: {
+            top: "70%",
+            itemWidth: 10,
+            itemHeight: 10,
+            data: [
+              "软件和信息技术服务",
+              "电信、广播电视和卫星传输",
+              "互联网和相关服务",
+            ],
+            textStyle: {
+              color: "rgba(255,255,255,.5)",
+              fontSize: "12",
+            },
+          },
+          series: [
+            {
+              name: "IT互联网行业",
+              type: "pie",
+              center: ["50%", "42%"],
+              radius: ["40%", "60%"],
+              color: [
+                "#065aab",
+                "#066eab",
+                "#0682ab",
+                "#0696ab",
+                "#06a0ab",
+                "#06b4ab",
+                "#06c8ab",
+                "#06dcab",
+                "#06f0ab",
+              ],
+              label: { show: false },
+              labelLine: { show: false },
+              data: [
+                { name: "软件和信息技术服务", value: 977084 },
+                { name: "电信、广播电视和卫星传输", value: 106294 },
+                { name: "互联网和相关服务", value: 258712 },
+              ],
+            },
+          ],
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts3_2-->
+    <script>
+      $(function echarts_32() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("fb2"));
+        option = {
+          title: [
+            {
+              text: "金融行业",
+              left: "center",
+              textStyle: {
+                color: "#fff",
+                fontSize: "16",
+              },
+            },
+          ],
+          tooltip: {
+            trigger: "item",
+            formatter: "{a} <br/>{b}: {c} ({d}%)",
+            position: function (p) {
+              //其中p为当前鼠标的位置
+              return [p[0] + 10, p[1] - 10];
+            },
+          },
+          legend: {
+            top: "70%",
+            itemWidth: 10,
+            itemHeight: 10,
+            data: ["金融行业", "资本市场", "货币金融", "其他", "保险"],
+            textStyle: {
+              color: "rgba(255,255,255,.5)",
+              fontSize: "12",
+            },
+          },
+          series: [
+            {
+              name: "金融行业",
+              type: "pie",
+              center: ["50%", "42%"],
+              radius: ["40%", "60%"],
+              color: [
+                "#065aab",
+                "#066eab",
+                "#0682ab",
+                "#0696ab",
+                "#06a0ab",
+                "#06b4ab",
+                "#06c8ab",
+                "#06dcab",
+                "#06f0ab",
+              ],
+              label: { show: false },
+              labelLine: { show: false },
+              data: [
+                { name: "金融行业", value: 45 },
+                { name: "资本市场", value: 172467 },
+                { name: "货币金融", value: 202444 },
+                { name: "其他", value: 57077 },
+                { name: "保险", value: 104538 },
+              ],
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts3_3-->
+    <script>
+      $(function echarts_33() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("fb3"));
+        option = {
+          title: [
+            {
+              text: "运输物流仓储",
+              left: "center",
+              textStyle: {
+                color: "#fff",
+                fontSize: "16",
+              },
+            },
+          ],
+          tooltip: {
+            trigger: "item",
+            formatter: "{a} <br/>{b}: {c} ({d}%)",
+            position: function (p) {
+              //其中p为当前鼠标的位置
+              return [p[0] + 10, p[1] - 10];
+            },
+          },
+          legend: {
+            top: "70%",
+            itemWidth: 10,
+            itemHeight: 10,
+            data: [
+              "铁路",
+              "邮政",
+              "道路",
+              "装卸搬运和运输代理",
+              "航空",
+              "水运",
+              "仓储",
+            ],
+            textStyle: {
+              color: "rgba(255,255,255,.5)",
+              fontSize: "12",
+            },
+          },
+          series: [
+            {
+              name: "运输物流仓储",
+              type: "pie",
+              center: ["50%", "42%"],
+              radius: ["40%", "60%"],
+              color: [
+                "#065aab",
+                "#066eab",
+                "#0682ab",
+                "#0696ab",
+                "#06a0ab",
+                "#06b4ab",
+                "#06c8ab",
+                "#06dcab",
+                "#06f0ab",
+              ],
+              label: { show: false },
+              labelLine: { show: false },
+              data: [
+                { name: "铁路", value: 3331 },
+                { name: "邮政", value: 118877 },
+                { name: "道路", value: 564787 },
+                { name: "装卸搬运和运输代理", value: 253375 },
+                { name: "航空", value: 8060 },
+                { name: "水运", value: 22755 },
+                { name: "仓储", value: 143798 },
+              ],
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts4-->
+    <script>
+      $(function echarts_4() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("echart4"));
+        option = {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              lineStyle: {
+                color: "#dddc6b",
+              },
+            },
+          },
+          legend: {
+            top: "0%",
+            data: ["IT互联网行业", "房地产"],
+            textStyle: {
+              color: "rgba(255,255,255,.5)",
+              fontSize: "12",
+            },
+          },
+          grid: {
+            left: "10",
+            top: "30",
+            right: "10",
+            bottom: "10",
+            containLabel: true,
+          },
+          xAxis: [
+            {
+              type: "category",
+              boundaryGap: false,
+              axisLabel: {
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: 12,
+                },
+              },
+              axisLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.2)",
+                },
+              },
+              data: [
+                "青岛",
+                "长沙",
+                "重庆",
+                "郑州",
+                "西安",
+                "苏州",
+                "沈阳",
+                "武汉",
+                "杭州",
+                "成都",
+                "天津",
+                "合肥",
+                "南京",
+                "佛山",
+                "东莞",
+              ],
+            },
+            {
+              axisPointer: { show: false },
+              axisLine: { show: false },
+              position: "bottom",
+              offset: 20,
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              axisTick: { show: false },
+              axisLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                },
+              },
+              axisLabel: {
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: 12,
+                },
+              },
+              splitLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                },
+              },
+            },
+          ],
+          series: [
+            {
+              name: "IT互联网行业",
+              data: [
+                16839, 22356, 38262, 33763, 27436, 20337, 12178, 34248, 31356,
+                50089, 16040, 16927, 30420, 7847, 11937,
+              ],
+              type: "line",
+              smooth: true,
+              symbol: "circle",
+              symbolSize: 5,
+              showSymbol: false,
+              lineStyle: {
+                normal: {
+                  color: "#0184d5",
+                  width: 2,
+                },
+              },
+              areaStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(
+                    0,
+                    0,
+                    0,
+                    1,
+                    [
+                      {
+                        offset: 0,
+                        color: "rgba(1, 132, 213, 0.4)",
+                      },
+                      {
+                        offset: 0.8,
+                        color: "rgba(1, 132, 213, 0.1)",
+                      },
+                    ],
+                    false
+                  ),
+                  shadowColor: "rgba(0, 0, 0, 0.1)",
+                },
+              },
+              itemStyle: {
+                normal: {
+                  color: "#0184d5",
+                  borderColor: "rgba(221, 220, 107, .1)",
+                  borderWidth: 12,
+                },
+              },
+            },
+            {
+              name: "房地产",
+              data: [
+                13292, 7770, 17510, 17584, 14516, 14485, 9193, 17220, 10323,
+                19205, 15400, 5051, 12325, 8481, 9617,
+              ],
+              type: "line",
+              smooth: true,
+              symbol: "circle",
+              symbolSize: 5,
+              showSymbol: false,
+              lineStyle: {
+                normal: {
+                  color: "#00d887",
+                  width: 2,
+                },
+              },
+              areaStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(
+                    0,
+                    0,
+                    0,
+                    1,
+                    [
+                      {
+                        offset: 0,
+                        color: "rgba(0, 216, 135, 0.4)",
+                      },
+                      {
+                        offset: 0.8,
+                        color: "rgba(0, 216, 135, 0.1)",
+                      },
+                    ],
+                    false
+                  ),
+                  shadowColor: "rgba(0, 0, 0, 0.1)",
+                },
+              },
+              itemStyle: {
+                normal: {
+                  color: "#00d887",
+                  borderColor: "rgba(221, 220, 107, .1)",
+                  borderWidth: 12,
+                },
+              },
+            },
+          ],
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts5-->
+    <script>
+      $(function echarts_5() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("echart5"));
+
+        option = {
+          //  backgroundColor: '#00265f',
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          grid: {
+            left: "0%",
+            top: "10px",
+            right: "0%",
+            bottom: "2%",
+            containLabel: true,
+          },
+          xAxis: [
+            {
+              type: "category",
+              data: [
+                "批发零售业",
+                "租赁商务",
+                "制造行业",
+                "科学研究",
+                "住宿餐饮",
+                "IT互联网",
+                "建筑业",
+                "居民服务",
+              ],
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                interval: 0,
+                // rotate:50,
+                show: true,
+                splitNumber: 15,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+            },
+          ],
+          yAxis: [
+            {
+              type: "value",
+              axisLabel: {
+                //formatter: '{value} %'
+                show: true,
+                textStyle: {
+                  color: "rgba(255,255,255,.6)",
+                  fontSize: "12",
+                },
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: "rgba(255,255,255,.1	)",
+                  width: 1,
+                  type: "solid",
+                },
+              },
+              splitLine: {
+                lineStyle: {
+                  color: "rgba(255,255,255,.1)",
+                },
+              },
+            },
+          ],
+          series: [
+            {
+              type: "bar",
+              data: [167346, 55939, 45326, 22382, 21885, 18796, 15244, 12470],
+              barWidth: "35%", //柱子宽度
+              // barGap: 1, //柱子之间间距
+              itemStyle: {
+                normal: {
+                  color: "#2f89cf",
+                  opacity: 1,
+                  barBorderRadius: 5,
+                },
+              },
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+    <!--echarts6-->
+    <script>
+      $(function echarts_6() {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("echart6"));
+        var dataStyle = {
+          normal: {
+            label: {
+              show: false,
+            },
+            labelLine: {
+              show: false,
+            },
+            //shadowBlur: 40,
+            //shadowColor: 'rgba(40, 40, 40, 1)',
+          },
+        };
+        var placeHolderStyle = {
+          normal: {
+            color: "rgba(255,255,255,.05)",
+            label: { show: false },
+            labelLine: { show: false },
+          },
+          emphasis: {
+            color: "rgba(0,0,0,0)",
+          },
+        };
+        option = {
+          color: ["#0f63d6", "#0f78d6", "#0f8cd6", "#0fa0d6", "#0fb4d6"],
+          tooltip: {
+            show: true,
+            formatter: "{a} : {c} ",
+          },
+          legend: {
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 12,
+            bottom: "3%",
+            data: ["北京", "上海", "广州", "深圳"],
+            textStyle: {
+              color: "rgba(255,255,255,.6)",
+            },
+          },
+          series: [
+            {
+              name: "北京",
+              type: "pie",
+              clockWise: false,
+              center: ["50%", "42%"],
+              radius: ["59%", "70%"],
+              itemStyle: dataStyle,
+              hoverAnimation: false,
+              data: [
+                {
+                  value: 1717739,
+                  name: "01",
+                },
+                {
+                  value: 282261,
+                  name: "invisible",
+                  tooltip: { show: false },
+                  itemStyle: placeHolderStyle,
+                },
+              ],
+            },
+
+            {
+              name: "上海",
+              type: "pie",
+              clockWise: false,
+              center: ["50%", "42%"],
+              radius: ["49%", "60%"],
+              itemStyle: dataStyle,
+              hoverAnimation: false,
+              data: [
+                {
+                  value: 1863549,
+                  name: "02",
+                },
+                {
+                  value: 136451,
+                  name: "invisible",
+                  tooltip: { show: false },
+                  itemStyle: placeHolderStyle,
+                },
+              ],
+            },
+
+            {
+              name: "广州",
+              type: "pie",
+              clockWise: false,
+              center: ["50%", "42%"],
+              radius: ["39%", "50%"],
+              itemStyle: dataStyle,
+              hoverAnimation: false,
+              data: [
+                {
+                  value: 1261475,
+                  name: "03",
+                },
+                {
+                  value: 738525,
+                  name: "invisible",
+                  tooltip: { show: false },
+                  itemStyle: placeHolderStyle,
+                },
+              ],
+            },
+
+            {
+              name: "深圳",
+              type: "pie",
+              clockWise: false,
+              center: ["50%", "42%"],
+              radius: ["30%", "40%"],
+              itemStyle: dataStyle,
+              hoverAnimation: false,
+              data: [
+                {
+                  value: 1962801,
+                  name: "05",
+                },
+                {
+                  value: 37199,
+                  name: "invisible",
+                  tooltip: { show: false },
+                  itemStyle: placeHolderStyle,
+                },
+              ],
+            },
+          ],
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      });
+    </script>
+
+    <!--map_1-->
+    <script>
+      Cesium.Ion.defaultAccessToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4M2FlYTczYS00ODQzLTQ0MjUtOTdmOC1iODZiNTQwYmI3YTAiLCJpZCI6NTU3NzUsImlhdCI6MTYyMDg5NTkwNX0.kGaNxQyEsc_B0I8wL6RBDwvfQ_9LWNOIw5SKyCIJGdk";
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        // terrainProvider: Cesium.createWorldTerrain(),
+        geocoder: false, // 地理位置查询定位控件
+        homeButton: false, // 默认相机位置控件
+        timeline: false, // 时间滚动条控件
+        navigationHelpButton: false, // 默认的相机控制提示控件
+        fullscreenButton: false, // 全屏控件
+        scene3DOnly: true, // 每个几何实例仅以3D渲染以节省GPU内存
+        baseLayerPicker: true, // 底图切换控件
+        animation: false, // 控制场景动画的播放速度控件
+        shouldAnimate: true, //开启动画
+      });
+      const tileset = new Cesium.Cesium3DTileset({
+        url: Cesium.IonResource.fromAssetId(69380),
+      });
+
+      const style = new Cesium.Cesium3DTileStyle({
+        color: {
+          conditions: [
+            // ["${Height} >= 101", 'color("purple", 0.5)'],
+            // ["${Height} >= 50", 'color("red")'],
+            ["true", 'color("blue")'],
+          ],
+        },
+        // show: "${Height} > 0",
+        meta: {
+          description: '"Building id ${id} has height ${Height}."',
+        },
+      });
+      //   tileset.style = style
+      viewer.scene.primitives.add(tileset);
+      handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      setTimeout(()=>{
+        AddCircleScanPostStage(
+        viewer,
+        new Cesium.Cartographic(
+          Cesium.Math.toRadians(144.95620825733346),
+          Cesium.Math.toRadians(-37.80854215059012),
+          0
+        ),
+        500,
+        new Cesium.Color(1.0, 0.0, 1.0, 1),
+        4000
+      );
+      AddRadarScanPostStage(
+        viewer,
+        new Cesium.Cartographic(
+          Cesium.Math.toRadians(144.9707473938716),
+          Cesium.Math.toRadians(-37.80904562967364),
+          0
+        ),
+        300,
+        new Cesium.Color(0.0, 0.0, 1.0, 1),
+        4000
+      );
+      },30000)
+
+    //   handler.setInputAction((event) => {
+    //     // 屏幕坐标转为空间坐标
+    //     let cartesian = viewer.camera.pickEllipsoid(
+    //       event.position,
+    //       viewer.scene.globe.ellipsoid
+    //     );
+    //     if (cartesian == undefined) {
+    //       console.log("没有获取到坐标");
+    //     } else {
+    //       // 空间坐标转世界坐标(弧度)
+    //       let cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    //       // 弧度转为角度（经纬度）
+    //       let lon = Cesium.Math.toDegrees(cartographic.longitude); // 经度值
+    //       let lat = Cesium.Math.toDegrees(cartographic.latitude); // 纬度值
+
+    //       console.log("经纬度是：", { x: lon, y: lat });
+    //       var CartographicCenter = new Cesium.Cartographic(
+    //         Cesium.Math.toRadians(lon),
+    //         Cesium.Math.toRadians(lat),
+    //         0
+    //       );
+
+    //       var scanColor = new Cesium.Color(1.0, 0.0, 1.0, 1);
+    //       if (Math.random() > 0.5) {
+    //         AddCircleScanPostStage(
+    //           viewer,
+    //           CartographicCenter,
+    //           500,
+    //           scanColor,
+    //           4000
+    //         );
+    //       } else {
+    //         AddRadarScanPostStage(
+    //           viewer,
+    //           CartographicCenter,
+    //           500,
+    //           scanColor,
+    //           4000
+    //         );
+    //       }
+    //     }
+    //   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+      // 去logo
+      viewer._cesiumWidget._creditContainer.style.display = "none";
+      // 解决 InfoBox出现的权限问题
+      // 可能是因为当前示例写法导致
+      // 解决减少控制台报错
+      const iframe = document.getElementsByClassName(
+        "cesium-infoBox-iframe"
+      )[0];
+      iframe.setAttribute(
+        "sandbox",
+        "allow-same-origin allow-scripts allow-popups allow-forms"
+      );
+      iframe.setAttribute("src", ""); //必须设置src为空 否则不会生效
+      (async () => {
+        try {
+          await tileset.readyPromise;
+          await viewer.zoomTo(tileset);
+
+          // Apply the default style if it exists
+          var extras = tileset.asset.extras;
+          if (
+            Cesium.defined(extras) &&
+            Cesium.defined(extras.ion) &&
+            Cesium.defined(extras.ion.defaultStyle)
+          ) {
+            tileset.style = new Cesium.Cesium3DTileStyle(
+              extras.ion.defaultStyle
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+      function AddCircleScanPostStage(
+        viewer,
+        cartographicCenter,
+        maxRadius,
+        scanColor,
+        duration
+      ) {
+        var ScanSegmentShader =
+          "uniform sampler2D colorTexture;\n" +
+          "uniform sampler2D depthTexture;\n" +
+          "varying vec2 v_textureCoordinates;\n" +
+          "uniform vec4 u_scanCenterEC;\n" +
+          "uniform vec3 u_scanPlaneNormalEC;\n" +
+          "uniform float u_radius;\n" +
+          "uniform vec4 u_scanColor;\n" +
+          "vec4 toEye(in vec2 uv, in float depth)\n" +
+          " {\n" +
+          " vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));\n" +
+          " vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);\n" +
+          " posInCamera =posInCamera / posInCamera.w;\n" +
+          " return posInCamera;\n" +
+          " }\n" +
+          "vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point)\n" +
+          "{\n" +
+          "vec3 v01 = point -planeOrigin;\n" +
+          "float d = dot(planeNormal, v01) ;\n" +
+          "return (point - planeNormal * d);\n" +
+          "}\n" +
+          "float getDepth(in vec4 depth)\n" +
+          "{\n" +
+          "float z_window = czm_unpackDepth(depth);\n" +
+          "z_window = czm_reverseLogDepth(z_window);\n" +
+          "float n_range = czm_depthRange.near;\n" +
+          "float f_range = czm_depthRange.far;\n" +
+          "return (2.0 * z_window - n_range - f_range) / (f_range - n_range);\n" +
+          "}\n" +
+          "void main()\n" +
+          "{\n" +
+          "gl_FragColor = texture2D(colorTexture, v_textureCoordinates);\n" +
+          "float depth = getDepth( texture2D(depthTexture, v_textureCoordinates));\n" +
+          "vec4 viewPos = toEye(v_textureCoordinates, depth);\n" +
+          "vec3 prjOnPlane = pointProjectOnPlane(u_scanPlaneNormalEC.xyz, u_scanCenterEC.xyz, viewPos.xyz);\n" +
+          "float dis = length(prjOnPlane.xyz - u_scanCenterEC.xyz);\n" +
+          "if(dis < u_radius)\n" +
+          "{\n" +
+          "float f = 1.0 -abs(u_radius - dis) / u_radius;\n" +
+          "f = pow(f, 4.0);\n" +
+          "gl_FragColor = mix(gl_FragColor, u_scanColor, f);\n" +
+          "}\n" +
+          "}\n";
+        var _Cartesian3Center =
+          Cesium.Cartographic.toCartesian(cartographicCenter);
+        var _Cartesian4Center = new Cesium.Cartesian4(
+          _Cartesian3Center.x,
+          _Cartesian3Center.y,
+          _Cartesian3Center.z,
+          1
+        );
+        var _CartographicCenter1 = new Cesium.Cartographic(
+          cartographicCenter.longitude,
+          cartographicCenter.latitude,
+          cartographicCenter.height + 500
+        );
+        var _Cartesian3Center1 =
+          Cesium.Cartographic.toCartesian(_CartographicCenter1);
+        var _Cartesian4Center1 = new Cesium.Cartesian4(
+          _Cartesian3Center1.x,
+          _Cartesian3Center1.y,
+          _Cartesian3Center1.z,
+          1
+        );
+        var _time = new Date().getTime();
+        var _scratchCartesian4Center = new Cesium.Cartesian4();
+        var _scratchCartesian4Center1 = new Cesium.Cartesian4();
+        var _scratchCartesian3Normal = new Cesium.Cartesian3();
+        var ScanPostStage = new Cesium.PostProcessStage({
+          fragmentShader: ScanSegmentShader,
+          uniforms: {
+            u_scanCenterEC: function () {
+              return Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center,
+                _scratchCartesian4Center
+              );
+            },
+            u_scanPlaneNormalEC: function () {
+              var temp = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center,
+                _scratchCartesian4Center
+              );
+              var temp1 = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center1,
+                _scratchCartesian4Center1
+              );
+              _scratchCartesian3Normal.x = temp1.x - temp.x;
+              _scratchCartesian3Normal.y = temp1.y - temp.y;
+              _scratchCartesian3Normal.z = temp1.z - temp.z;
+              Cesium.Cartesian3.normalize(
+                _scratchCartesian3Normal,
+                _scratchCartesian3Normal
+              );
+              return _scratchCartesian3Normal;
+            },
+            u_radius: function () {
+              return (
+                (maxRadius * ((new Date().getTime() - _time) % duration)) /
+                duration
+              );
+            },
+            u_scanColor: scanColor,
+          },
+        });
+        viewer.scene.postProcessStages.add(ScanPostStage);
+      }
+
+      function AddRadarScanPostStage(
+        viewer,
+        cartographicCenter,
+        radius,
+        scanColor,
+        duration
+      ) {
+        var ScanSegmentShader =
+          "uniform sampler2D colorTexture;\n" +
+          "uniform sampler2D depthTexture;\n" +
+          "varying vec2 v_textureCoordinates;\n" +
+          "uniform vec4 u_scanCenterEC;\n" +
+          "uniform vec3 u_scanPlaneNormalEC;\n" +
+          "uniform vec3 u_scanLineNormalEC;\n" +
+          "uniform float u_radius;\n" +
+          "uniform vec4 u_scanColor;\n" +
+          "vec4 toEye(in vec2 uv, in float depth)\n" +
+          " {\n" +
+          " vec2 xy = vec2((uv.x * 2.0 - 1.0),(uv.y * 2.0 - 1.0));\n" +
+          " vec4 posInCamera =czm_inverseProjection * vec4(xy, depth, 1.0);\n" +
+          " posInCamera =posInCamera / posInCamera.w;\n" +
+          " return posInCamera;\n" +
+          " }\n" +
+          "bool isPointOnLineRight(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt)\n" +
+          "{\n" +
+          "vec3 v01 = testPt - ptOnLine;\n" +
+          "normalize(v01);\n" +
+          "vec3 temp = cross(v01, lineNormal);\n" +
+          "float d = dot(temp, u_scanPlaneNormalEC);\n" +
+          "return d > 0.5;\n" +
+          "}\n" +
+          "vec3 pointProjectOnPlane(in vec3 planeNormal, in vec3 planeOrigin, in vec3 point)\n" +
+          "{\n" +
+          "vec3 v01 = point -planeOrigin;\n" +
+          "float d = dot(planeNormal, v01) ;\n" +
+          "return (point - planeNormal * d);\n" +
+          "}\n" +
+          "float distancePointToLine(in vec3 ptOnLine, in vec3 lineNormal, in vec3 testPt)\n" +
+          "{\n" +
+          "vec3 tempPt = pointProjectOnPlane(lineNormal, ptOnLine, testPt);\n" +
+          "return length(tempPt - ptOnLine);\n" +
+          "}\n" +
+          "float getDepth(in vec4 depth)\n" +
+          "{\n" +
+          "float z_window = czm_unpackDepth(depth);\n" +
+          "z_window = czm_reverseLogDepth(z_window);\n" +
+          "float n_range = czm_depthRange.near;\n" +
+          "float f_range = czm_depthRange.far;\n" +
+          "return (2.0 * z_window - n_range - f_range) / (f_range - n_range);\n" +
+          "}\n" +
+          "void main()\n" +
+          "{\n" +
+          "gl_FragColor = texture2D(colorTexture, v_textureCoordinates);\n" +
+          "float depth = getDepth( texture2D(depthTexture, v_textureCoordinates));\n" +
+          "vec4 viewPos = toEye(v_textureCoordinates, depth);\n" +
+          "vec3 prjOnPlane = pointProjectOnPlane(u_scanPlaneNormalEC.xyz, u_scanCenterEC.xyz, viewPos.xyz);\n" +
+          "float dis = length(prjOnPlane.xyz - u_scanCenterEC.xyz);\n" +
+          "float twou_radius = u_radius * 2.0;\n" +
+          "if(dis < u_radius)\n" +
+          "{\n" +
+          "float f0 = 1.0 -abs(u_radius - dis) / u_radius;\n" +
+          "f0 = pow(f0, 64.0);\n" +
+          "vec3 lineEndPt = vec3(u_scanCenterEC.xyz) + u_scanLineNormalEC * u_radius;\n" +
+          "float f = 0.0;\n" +
+          "if(isPointOnLineRight(u_scanCenterEC.xyz, u_scanLineNormalEC.xyz, prjOnPlane.xyz))\n" +
+          "{\n" +
+          "float dis1= length(prjOnPlane.xyz - lineEndPt);\n" +
+          "f = abs(twou_radius -dis1) / twou_radius;\n" +
+          "f = pow(f, 3.0);\n" +
+          "}\n" +
+          "gl_FragColor = mix(gl_FragColor, u_scanColor, f + f0);\n" +
+          "}\n" +
+          "}\n";
+        var _Cartesian3Center =
+          Cesium.Cartographic.toCartesian(cartographicCenter);
+        var _Cartesian4Center = new Cesium.Cartesian4(
+          _Cartesian3Center.x,
+          _Cartesian3Center.y,
+          _Cartesian3Center.z,
+          1
+        );
+        var _CartographicCenter1 = new Cesium.Cartographic(
+          cartographicCenter.longitude,
+          cartographicCenter.latitude,
+          cartographicCenter.height + 500
+        );
+        var _Cartesian3Center1 =
+          Cesium.Cartographic.toCartesian(_CartographicCenter1);
+        var _Cartesian4Center1 = new Cesium.Cartesian4(
+          _Cartesian3Center1.x,
+          _Cartesian3Center1.y,
+          _Cartesian3Center1.z,
+          1
+        );
+        var _CartographicCenter2 = new Cesium.Cartographic(
+          cartographicCenter.longitude + Cesium.Math.toRadians(0.001),
+          cartographicCenter.latitude,
+          cartographicCenter.height
+        );
+        var _Cartesian3Center2 =
+          Cesium.Cartographic.toCartesian(_CartographicCenter2);
+        var _Cartesian4Center2 = new Cesium.Cartesian4(
+          _Cartesian3Center2.x,
+          _Cartesian3Center2.y,
+          _Cartesian3Center2.z,
+          1
+        );
+        var _RotateQ = new Cesium.Quaternion();
+        var _RotateM = new Cesium.Matrix3();
+        var _time = new Date().getTime();
+        var _scratchCartesian4Center = new Cesium.Cartesian4();
+        var _scratchCartesian4Center1 = new Cesium.Cartesian4();
+        var _scratchCartesian4Center2 = new Cesium.Cartesian4();
+        var _scratchCartesian3Normal = new Cesium.Cartesian3();
+        var _scratchCartesian3Normal1 = new Cesium.Cartesian3();
+        var ScanPostStage = new Cesium.PostProcessStage({
+          fragmentShader: ScanSegmentShader,
+          uniforms: {
+            u_scanCenterEC: function () {
+              return Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center,
+                _scratchCartesian4Center
+              );
+            },
+            u_scanPlaneNormalEC: function () {
+              var temp = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center,
+                _scratchCartesian4Center
+              );
+              var temp1 = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center1,
+                _scratchCartesian4Center1
+              );
+              _scratchCartesian3Normal.x = temp1.x - temp.x;
+              _scratchCartesian3Normal.y = temp1.y - temp.y;
+              _scratchCartesian3Normal.z = temp1.z - temp.z;
+              Cesium.Cartesian3.normalize(
+                _scratchCartesian3Normal,
+                _scratchCartesian3Normal
+              );
+              return _scratchCartesian3Normal;
+            },
+            u_radius: radius,
+            u_scanLineNormalEC: function () {
+              var temp = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center,
+                _scratchCartesian4Center
+              );
+              var temp1 = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center1,
+                _scratchCartesian4Center1
+              );
+              var temp2 = Cesium.Matrix4.multiplyByVector(
+                viewer.camera._viewMatrix,
+                _Cartesian4Center2,
+                _scratchCartesian4Center2
+              );
+              _scratchCartesian3Normal.x = temp1.x - temp.x;
+              _scratchCartesian3Normal.y = temp1.y - temp.y;
+              _scratchCartesian3Normal.z = temp1.z - temp.z;
+              Cesium.Cartesian3.normalize(
+                _scratchCartesian3Normal,
+                _scratchCartesian3Normal
+              );
+              _scratchCartesian3Normal1.x = temp2.x - temp.x;
+              _scratchCartesian3Normal1.y = temp2.y - temp.y;
+              _scratchCartesian3Normal1.z = temp2.z - temp.z;
+              var tempTime =
+                ((new Date().getTime() - _time) % duration) / duration;
+              Cesium.Quaternion.fromAxisAngle(
+                _scratchCartesian3Normal,
+                tempTime * Cesium.Math.PI * 2,
+                _RotateQ
+              );
+              Cesium.Matrix3.fromQuaternion(_RotateQ, _RotateM);
+              Cesium.Matrix3.multiplyByVector(
+                _RotateM,
+                _scratchCartesian3Normal1,
+                _scratchCartesian3Normal1
+              );
+              Cesium.Cartesian3.normalize(
+                _scratchCartesian3Normal1,
+                _scratchCartesian3Normal1
+              );
+              return _scratchCartesian3Normal1;
+            },
+            u_scanColor: scanColor,
+          },
+        });
+        viewer.scene.postProcessStages.add(ScanPostStage);
+      }
+      var bounds = {
+        west: 144.94931588530534,
+        east: 144.9690669387222,
+        south: -37.81350848863627,
+        north: -37.81805079926464,
+      };
+
+      viewer.camera.setView({
+        destination: new Cesium.Rectangle(
+          Cesium.Math.toRadians(bounds.west),
+          Cesium.Math.toRadians(bounds.south),
+          Cesium.Math.toRadians(bounds.east),
+          Cesium.Math.toRadians(bounds.north)
+        ),
+      });
+
+      var heatMap = CesiumHeatmap.create(viewer, bounds, {
+        radius: 500,
+        // heatmap.js options go here
+      });
+      // 144.97358570178218, y: -37.8092093179302
+      var data = [];
+      //   for (let i = 0; i < 50; i++) {
+      data.push(
+        {
+          x: 144.9581561157283,
+          y: -37.81927203461015,
+          value: Math.random() * 100,
+        },
+        {
+          x: 144.95322701542037,
+          y: -37.815396770470095,
+          value: Math.random() * 100,
+        },
+        {
+          x: 144.96092546751433,
+          y: -37.81324158635595,
+          value: Math.random() * 100,
+        }
+      );
+      //   }
+      // var data = [{ "x": 147.1383442264, "y": -41.4360048372, "value": 76 }, { "x": 147.1384363011, "y": -41.4360298848, "value": 63 }, { "x": 147.138368102, "y": -41.4358360603, "value": 1 }, { "x": 147.1385627739, "y": -41.4358799123, "value": 21 }, { "x": 147.1385138501, "y": -41.4359327669, "value": 28 }, { "x": 147.1385031219, "y": -41.4359730105, "value": 41 }, { "x": 147.1384127393, "y": -41.435928255, "value": 75 }, { "x": 147.1384551136, "y": -41.4359450132, "value": 3 }, { "x": 147.1384927196, "y": -41.4359158649, "value": 45 }, { "x": 147.1384938639, "y": -41.4358498311, "value": 45 }, { "x": 147.1385183299, "y": -41.4360213794, "value": 93 }, { "x": 147.1384007925, "y": -41.4359860133, "value": 46 }, { "x": 147.1383604844, "y": -41.4358298672, "value": 54 }, { "x": 147.13851025, "y": -41.4359098303, "value": 39 }, { "x": 147.1383874733, "y": -41.4358511035, "value": 34 }, { "x": 147.1384981796, "y": -41.4359355403, "value": 81 }, { "x": 147.1384504107, "y": -41.4360332348, "value": 39 }, { "x": 147.1385582664, "y": -41.4359788335, "value": 20 }, { "x": 147.1383967364, "y": -41.4360581999, "value": 35 }, { "x": 147.1383839615, "y": -41.436016316, "value": 47 }, { "x": 147.1384082712, "y": -41.4358423338, "value": 36 }, { "x": 147.1385092651, "y": -41.4358577623, "value": 69 }, { "x": 147.138360356, "y": -41.436046789, "value": 90 }, { "x": 147.138471893, "y": -41.4359184292, "value": 88 }, { "x": 147.1385605689, "y": -41.4360271359, "value": 81 }, { "x": 147.1383585714, "y": -41.4359362476, "value": 32 }, { "x": 147.1384939114, "y": -41.4358844253, "value": 67 }, { "x": 147.138466724, "y": -41.436019121, "value": 17 }, { "x": 147.1385504355, "y": -41.4360614056, "value": 49 }, { "x": 147.1383883832, "y": -41.4358733544, "value": 82 }, { "x": 147.1385670669, "y": -41.4359650236, "value": 25 }, { "x": 147.1383416534, "y": -41.4359310876, "value": 82 }, { "x": 147.138525285, "y": -41.4359394661, "value": 66 }, { "x": 147.1385487719, "y": -41.4360137656, "value": 73 }, { "x": 147.1385496029, "y": -41.4359187277, "value": 73 }, { "x": 147.1383989222, "y": -41.4358556562, "value": 61 }, { "x": 147.1385499424, "y": -41.4359149305, "value": 67 }, { "x": 147.138404523, "y": -41.4359563326, "value": 90 }, { "x": 147.1383883675, "y": -41.4359794855, "value": 78 }, { "x": 147.1383967187, "y": -41.435891185, "value": 15 }, { "x": 147.1384610005, "y": -41.4359044797, "value": 15 }, { "x": 147.1384688489, "y": -41.4360396127, "value": 91 }, { "x": 147.1384431875, "y": -41.4360684409, "value": 8 }, { "x": 147.1385411067, "y": -41.4360645847, "value": 42 }, { "x": 147.1385237178, "y": -41.4358843181, "value": 31 }, { "x": 147.1384406464, "y": -41.4360003831, "value": 51 }, { "x": 147.1384679169, "y": -41.4359950456, "value": 96 }, { "x": 147.1384194314, "y": -41.4358419739, "value": 22 }, { "x": 147.1385049792, "y": -41.4359574813, "value": 44 }, { "x": 147.1384097378, "y": -41.4358598672, "value": 82 }, { "x": 147.1384993219, "y": -41.4360352975, "value": 84 }, { "x": 147.1383640499, "y": -41.4359839518, "value": 81 }];
+      var valueMin = 0;
+      var valueMax = 100;
+
+      heatMap.setWGS84Data(valueMin, valueMax, data);
+    </script>
+  </body>
+</html>

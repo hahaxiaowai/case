@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="View datasets underneath the surface with globe translucency."
+    />
+    <meta name="cesium-sandcastle-labels" content="Showcases" />
+    <script type="text/javascript" src="../Sandcastle-header.js"></script>
+    <title>Cesium Demo</title>
+    <script
+      type="text/javascript"
+      src="../Cesium.js"
+
+    ></script>
+
+  </head>
+  <body
+    class="sandcastle-loading"
+    data-sandcastle-bucket="bucket-requirejs.html"
+  >
+    <style>
+      @import url(../Widgets/widgets.css);
+      @import url(../bucket.css);
+      #toolbar {
+        background: rgba(42, 42, 42, 0.8);
+        padding: 4px;
+        border-radius: 4px;
+      }
+      #toolbar input {
+        vertical-align: middle;
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
+      #toolbar .header {
+        font-weight: bold;
+      }
+    </style>
+    <div id="cesiumContainer" class="fullSize"></div>
+    <div id="loadingOverlay"><h1>Loading...</h1></div>
+    <div id="toolbar">
+      <table>
+        <tbody>
+          <tr>
+            <td>雨量监控</td>
+            <td>
+              <input type="checkbox" data-bind="checked: rainShow" />
+            </td>
+          </tr>
+          <tr>
+            <td>雨量时间轴</td>
+            <td>
+              <input
+              style="width: 500px;"
+                type="range"
+                min="0.0"
+                max="217"
+                step="1"
+                data-bind="value: rainTime, valueUpdate: 'input'"
+              />
+              <input type="text" size="5" data-bind="value: rainTime" />
+            </td>
+          </tr>
+          <tr>
+            <td>管线</td>
+            <td>
+              <input type="checkbox" data-bind="checked: pipeShow" />
+            </td>
+          </tr>
+          <tr>
+            <td>管线时间轴</td>
+            <td>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="1"
+                data-bind="value: pipeTime, valueUpdate: 'input'"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>预测雨量</td>
+            <td>
+              <input type="checkbox" data-bind="checked: reportShow" />
+            </td>
+          </tr>
+          <tr>
+            <td>预测雨量时间轴</td>
+            <td>
+              <input
+                type="range"
+                min="0.0"
+                max="23"
+                step="1"
+                data-bind="value: reportTime, valueUpdate: 'input'"
+              />
+              <input type="text" size="5" data-bind="value: reportTime" />
+            </td>
+          </tr>
+          <tr>
+            <td>积水深度</td>
+            <td>
+              <input type="checkbox" data-bind="checked: deepShow" />
+            </td>
+          </tr>
+          <tr>
+            <td>积水深度时间轴</td>
+            <td>
+              <input
+                type="range"
+                min="0.0"
+                max="12"
+                step="1"
+                data-bind="value: deepTime, valueUpdate: 'input'"
+              />
+              <input type="text" size="5" data-bind="value: deepTime" />
+            </td>
+          </tr>
+          <tr>
+            <td>积水速度</td>
+            <td>
+              <input type="checkbox" data-bind="checked: speedShow" />
+            </td>
+          </tr>
+          <tr>
+            <td>积水速度时间轴</td>
+            <td>
+              <input
+                type="range"
+                min="0.0"
+                max="12"
+                step="1"
+                data-bind="value: speedTime, valueUpdate: 'input'"
+              />
+              <input type="text" size="5" data-bind="value: speedTime" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script id="cesium_sandcastle_script">
+      window.startup = function (Cesium) {
+        "use strict";
+        //Sandcastle_Begin
+        const viewer = new Cesium.Viewer("cesiumContainer", {
+          // terrainProvider: Cesium.createWorldTerrain(),
+        });
+
+        const scene = viewer.scene;
+        const globe = scene.globe;
+
+        scene.screenSpaceCameraController.enableCollisionDetection = false;
+        globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(
+          400.0,
+          0.0,
+          800.0,
+          1.0
+        );
+        viewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(116.39, 40.03, 30000.0),
+        });
+        window.rainFall = new Cesium.Rainfall(
+          viewer,
+          "http://127.0.0.1:8088/data/region.json",
+          "http://127.0.0.1:8088/data/rain.json"
+        );
+        window.layer = new Cesium.VolumeLayer(
+          viewer,
+          " http://127.0.0.1:8088/data/pipeline.pbf",
+          {
+            opacity: 0.2,
+            pipeManholeColor:[255,0,0,255],
+            pipelineColor:[0,255,0,255]
+          }
+        );
+        window.layer.addClickEvent((id) => {
+          console.log(id);
+        });
+        window.layer.updatePipeLineTimeData("2022-07-11","http://127.0.0.1:8088/data/pipelineTime.json");
+        window.layer.updatePipeLineTimeData("2022-07-12","http://127.0.0.1:8088/data/pipelineTime2.json");
+        window.rainSimulation = new Cesium.WaterSimulation({
+          scene: viewer.scene,
+          rowCount: 580,
+          colCount: 670,
+          rectangle: Cesium.Rectangle.fromDegrees(
+            113.83253,
+            39.089586,
+            117.86235,
+            41.741202
+          ),
+          // 降雨
+          colorArray: [
+            [0, 0, 0, 0],
+            [255, 0, 0, 128],
+            [255, 0, 0, 128],
+            [255, 0, 0, 128],
+            [255, 0, 0, 128],
+            [255, 0, 0, 128],
+            [255, 0, 0, 128],
+          ],
+        });
+        for (let fileIndex = 0; fileIndex < 24; fileIndex++) {
+          const filePath = `http://127.0.0.1:8088/data/rainreport/data_${fileIndex}.yc`;
+          window.rainSimulation.loadData(filePath, fileIndex);
+        }
+        window.waterSimulation = new Cesium.WaterSimulation({
+          scene: viewer.scene,
+          rowCount: 1629,
+          colCount: 2647,
+          rectangle: Cesium.Rectangle.fromDegrees(
+            116.207069,
+            39.952786,
+            116.517032,
+            40.100430
+          ),
+          // 积水深度
+          colorArray: [
+            [0, 0, 0, 0],
+            [179, 204, 255, 128],
+            [128, 153, 255, 255],
+            [89, 128, 255, 255],
+            [0, 77, 204, 255],
+          ],
+          // 积水速度
+          // colorArray: [
+          //       [0, 0, 0, 0],
+          //       [118, 220, 209, 255],
+          //       [3, 169, 150, 255],
+          //       [3, 142, 127, 255],
+          //       [3, 123, 109, 255]
+          //   ]
+        });
+
+        for (let fileIndex = 0; fileIndex < 13; fileIndex++) {
+          const filePath = `http://127.0.0.1:8088/data/qinghe/deep/data_${fileIndex}.yc`;
+          window.waterSimulation.loadData(filePath, fileIndex);
+        }
+        window.waterSimulation2 = new Cesium.WaterSimulation({
+          scene: viewer.scene,
+          rowCount: 1629,
+          colCount: 2647,
+          rectangle: Cesium.Rectangle.fromDegrees(
+            116.207069,
+            39.952786,
+            116.517032,
+            40.100430
+          ),
+          // 积水深度
+          // colorArray: [
+          //       [0, 0, 0, 0],
+          //       [179, 204, 255, 128],
+          //       [128, 153, 255, 255],
+          //       [89, 128, 255, 255],
+          //       [0, 77, 204, 255]
+          //   ]
+          // 积水速度
+          colorArray: [
+            [0, 0, 0, 0],
+            [118, 220, 209, 255],
+            [3, 169, 150, 255],
+            [3, 142, 127, 255],
+            [3, 123, 109, 255],
+          ],
+        });
+
+        for (let fileIndex = 0; fileIndex < 13; fileIndex++) {
+          const filePath = `http://127.0.0.1:8088/data/qinghe/speed/data_${fileIndex}.yc`;
+          window.waterSimulation2.loadData(filePath, fileIndex);
+        }
+
+        const viewModel = {
+          rainShow: true,
+          rainTime: 0,
+          pipeShow: false,
+          reportShow: false,
+          reportTime: 0,
+          deepShow: false,
+          deepTime: 0,
+          speedShow: false,
+          speedTime: 0,
+          pipeTime :-1,
+        };
+
+        Cesium.knockout.track(viewModel);
+        const toolbar = document.getElementById("toolbar");
+        Cesium.knockout.applyBindings(viewModel, toolbar);
+        for (const name in viewModel) {
+          if (viewModel.hasOwnProperty(name)) {
+            Cesium.knockout.getObservable(viewModel, name).subscribe(update);
+          }
+        }
+        let lastShow = false
+        function update() {
+          if (window.rainFall.rainData) {
+            const times = Object.keys(window.rainFall.rawData);
+            window.rainFall.setTime(times[viewModel.rainTime]);
+            window.rainFall.setVisible(viewModel.rainShow);
+          }
+          // if (window.layer.volume) {
+          window.layer.setVisible(viewModel.pipeShow);
+          if(viewModel.pipeShow && layer._instances.length > 0){
+            const times = {
+              0: "2022-07-11",
+              1: "2022-07-12",
+            }
+            if(viewModel.pipeTime !== -1){
+            window.layer.setTime(times[viewModel.pipeTime]);
+            }
+          }
+          if(lastShow !== viewModel.pipeShow){
+            lastShow  = viewModel.pipeShow
+            if (viewModel.pipeShow) {
+            viewer.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(
+                116.34645544300008,
+                39.99053736900004,
+                100
+              ),
+            });
+          } else{
+            viewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(116.39, 40.03, 30000.0),
+        });
+          }
+          }
+
+          // }
+          window.rainSimulation.setVisible(viewModel.reportShow);
+          window.rainSimulation.updateTime(viewModel.reportTime);
+          window.waterSimulation.setVisible(viewModel.deepShow);
+          window.waterSimulation.updateTime(viewModel.deepTime);
+          window.waterSimulation2.setVisible(viewModel.speedShow);
+          window.waterSimulation2.updateTime(viewModel.speedTime);
+        }
+        update();
+
+        // viewer.scene.camera.setView({
+        //   destination: new Cesium.Cartesian3(
+        //     3826465.9884728403,
+        //     -254831.02751468265,
+        //     5081387.671561018
+        //   ),
+        //   orientation: new Cesium.HeadingPitchRoll(
+        //     3.3889450556243754,
+        //     -0.5276382514771969,
+        //     6.282272566663295
+        //   ),
+        //   endTransform: Cesium.Matrix4.IDENTITY,
+        // });
+
+        // viewer.scene.camera.flyTo({
+        //   destination: new Cesium.Cartesian3(
+        //     3827270.552916987,
+        //     -255123.18143177085,
+        //     5079147.091351856
+        //   ),
+        //   orientation: new Cesium.HeadingPitchRoll(
+        //     3.2624281242239963,
+        //     -0.22213535190506972,
+        //     6.282786783842843
+        //   ),
+        //   duration: 5.0,
+        // });
+        //Sandcastle_End
+        Sandcastle.finishedLoading();
+      };
+      if (typeof Cesium !== "undefined") {
+        window.startupCalled = true;
+        window.startup(Cesium);
+      }
+    </script>
+  </body>
+</html>
